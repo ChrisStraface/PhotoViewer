@@ -11,6 +11,7 @@ import javafx.application.Application;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class MyFxApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("My First JavaFX App");
 
-        Image image = new Image( new FileInputStream("spongebob.png"));
+        Image image = new Image (new FileInputStream("spongebob.png"));
         Image image2 = new Image(new FileInputStream("patrick.png"));
         Image image3 = new Image(new FileInputStream("mrkrabs2.png"));
         Image image4 = new Image(new FileInputStream("squid2.png"));
@@ -39,10 +40,10 @@ public class MyFxApp extends Application {
 
         ImageView imageView = new ImageView(latestImage);
 
-        Button addimageButton = new Button("Change the image!");
+        Button addimageButton = new Button("Go forward an image!");
         addimageButton.setOnAction(e -> {
            i = i + 1;
-           if (i < 5) {
+           if (i < 6) {
                latestImage = list.get(i);
                imageView.setImage(latestImage);
            }
@@ -54,7 +55,7 @@ public class MyFxApp extends Application {
         Button deleteimageButton = new Button("Go back an image!");
         deleteimageButton.setOnAction(e -> {
            i = i - 1;
-           if (i > 0) {
+           if (i > -1) {
                latestImage = list.get(i);
                imageView.setImage(latestImage);
            }
@@ -66,8 +67,8 @@ public class MyFxApp extends Application {
         ChoiceBox imageBox = new ChoiceBox();
         imageBox.getItems().add("Spongebob");
         imageBox.getItems().add("Patrick");
-        imageBox.getItems().add("Squidward");
         imageBox.getItems().add("Mr. Krabs");
+        imageBox.getItems().add("Squidward");
         imageBox.getItems().add("Bubble Bass");
 
         imageBox.setOnAction(e -> {
@@ -76,16 +77,34 @@ public class MyFxApp extends Application {
             imageView.setImage(latestImage);
         });
 
+        ChoiceBox deleteBox = new ChoiceBox();
+        deleteBox.getItems().add("Delete Spongebob");
+        deleteBox.getItems().add("Delete Patrick");
+        deleteBox.getItems().add("Delete Mr. Krabs");
+        deleteBox.getItems().add("Delete Squidward");
+        deleteBox.getItems().add("Delete Bubble Bass");
+
+        deleteBox.setOnAction(e -> {
+        int selectedIndex = deleteBox.getSelectionModel().getSelectedIndex();
+        list.remove(selectedIndex);
+    });
+
         Label label = new Label("Welcome to the image viewer!");
 
 
-        FileChooser fileChooser = new FileChooser();
         Button chooserButton = new Button("Select File");
         chooserButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
             File selectedFile = fileChooser.showOpenDialog(primaryStage);
+            try {
+                Image newImage = new Image(new FileInputStream(selectedFile));
+                list.add(newImage);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
-        VBox vBox = new VBox(imageView, label, addimageButton, deleteimageButton, imageBox, chooserButton);
+        VBox vBox = new VBox(imageView, label, addimageButton, deleteimageButton, imageBox, deleteBox, chooserButton);
 
         Scene scene = new Scene(vBox, 400, 700);
         primaryStage.setScene(scene);
